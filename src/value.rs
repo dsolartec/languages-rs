@@ -159,7 +159,7 @@ impl Value {
     /// assert!(table.is_some());
     ///
     /// let table = table.unwrap();
-    /// let text = table.get(&String::from("hi"));
+    /// let text = table.get("hi");
     /// assert!(text.is_some());
     /// assert!(text.unwrap().is_string());
     /// ```
@@ -189,13 +189,76 @@ impl Value {
     /// assert!(table.is_some());
     ///
     /// let table = table.unwrap();
-    /// let text = table.get(&String::from("hi"));
+    /// let text = table.get("hi");
     /// assert!(text.is_some());
     /// assert_eq!(text.unwrap().get_string(), Some(String::from("Hi")));
     /// ```
     pub fn get_string(&self) -> Option<String> {
         match self {
             Self::String(value) => Some(value.clone()),
+            _ => None,
+        }
+    }
+
+    /// Check if the current value is an array.
+    ///
+    /// # Example JSON
+    /// ```rust
+    /// use languages_rs::{Format, Value};
+    ///
+    /// let value = Value::from_string(String::from("[\"1\", \"2\"]"), Format::JSON);
+    /// assert!(value.is_ok());
+    /// assert!(value.unwrap().is_array());
+    /// ```
+    ///
+    /// # Example TOML
+    /// ```rust
+    /// use languages_rs::{Format, Value};
+    ///
+    /// let value = Value::from_string(String::from("numbers = [\"1\", \"2\"]"), Format::TOML);
+    /// assert!(value.is_ok());
+    ///
+    /// let table = value.unwrap().get_object();
+    /// assert!(table.is_some());
+    ///
+    /// let table = table.unwrap();
+    /// let values = table.get("numbers");
+    /// assert!(values.is_some());
+    /// assert!(values.unwrap().is_array());
+    /// ```
+    pub fn is_array(&self) -> bool {
+        matches!(self, Self::Array(_))
+    }
+
+    /// Get the array value.
+    ///
+    /// # Example JSON
+    /// ```rust
+    /// use languages_rs::{Format, Value};
+    ///
+    /// let value = Value::from_string(String::from("[\"1\", \"2\"]"), Format::JSON);
+    /// assert!(value.is_ok());
+    /// assert_eq!(value.unwrap().get_array(), Some(vec![Value::String(String::from("1")), Value::String(String::from("2"))]));
+    /// ```
+    ///
+    /// # Example TOML
+    /// ```rust
+    /// use languages_rs::{Format, Value};
+    ///
+    /// let value = Value::from_string(String::from("numbers = [\"1\", \"2\"]"), Format::TOML);
+    /// assert!(value.is_ok());
+    ///
+    /// let table = value.unwrap().get_object();
+    /// assert!(table.is_some());
+    ///
+    /// let table = table.unwrap();
+    /// let values = table.get("numbers");
+    /// assert!(values.is_some());
+    /// assert_eq!(values.unwrap().get_array(), Some(vec![Value::String(String::from("1")), Value::String(String::from("2"))]));
+    /// ```
+    pub fn get_array(&self) -> Option<Vec<Value>> {
+        match self {
+            Self::Array(data) => Some(data.clone()),
             _ => None,
         }
     }
@@ -265,7 +328,7 @@ impl Value {
 impl fmt::Display for Value {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::String(value) => write!(f, "{:?}", value),
+            Self::String(value) => write!(f, "{}", value),
             Self::Array(value) => write!(
                 f,
                 "[{}]",
@@ -278,7 +341,7 @@ impl fmt::Display for Value {
             Self::Object(value) => {
                 write!(
                     f,
-                    "{}",
+                    "{{ {} }}",
                     value
                         .into_iter()
                         .map(|(key, value)| format!("{}: {}", key, value))
