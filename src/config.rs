@@ -42,6 +42,41 @@ pub struct Config {
 }
 
 impl Config {
+    /// Create a new configuration.
+    ///
+    /// # Example
+    /// ```rust, ignore
+    /// use languages_rs::{Config, Format};
+    ///
+    /// let config: Config = match Config::new("languages", Format::JSON, vec!["en"]) {
+    ///     Ok(config) => config,
+    ///     Err(e) => {
+    ///         eprintln!("Error: {}", e);
+    ///         return;
+    ///     },
+    /// };
+    /// ```
+    pub fn new(directory: &str, format: Format, languages: Vec<&str>) -> anyhow::Result<Self> {
+        let path = Path::new(&env::current_dir()?).join(directory);
+        if !path.exists() {
+            return Err(anyhow::Error::msg(format!(
+                "Cannot find `{}` directory.",
+                path.display()
+            )));
+        } else if !path.is_dir() {
+            return Err(anyhow::Error::msg(format!(
+                "The path `{}` is not a directory.",
+                path.display()
+            )));
+        }
+
+        Ok(Self {
+            directory: path.display().to_string(),
+            format,
+            languages: languages.iter().map(|e| String::from(e.clone())).collect(),
+        })
+    }
+
     /// Get the default configuration.
     ///
     /// # Default
