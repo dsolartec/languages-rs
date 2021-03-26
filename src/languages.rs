@@ -37,7 +37,7 @@ impl Languages {
     /// let mut config = Config::default().unwrap();
     /// assert!(config.add_language(String::from("en")).is_ok());
     ///
-    /// let texts = Languages::new(&config);
+    /// let mut texts = Languages::new(&config);
     ///
     /// let texts_en = texts.try_get_language("en");
     /// assert!(texts_en.is_ok());
@@ -93,7 +93,7 @@ impl Languages {
     /// let mut config = Config::default().unwrap();
     /// assert!(config.add_language(String::from("en")).is_ok());
     ///
-    /// let texts = Languages::new(&config);
+    /// let mut texts = Languages::new(&config);
     ///
     /// let message = texts.try_get_text_from_language("en", "message");
     /// assert!(message.is_ok());
