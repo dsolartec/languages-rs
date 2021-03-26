@@ -1,0 +1,13 @@
+{
+    "greeting": "Hello, world!",
+    "messages": [
+        "This is the first message.",
+        "This is the second message."
+    ],
+    "pages": {
+        "home": {
+            "title": "Home page",
+            "description": "This is the home page."
+        }
+    }
+}

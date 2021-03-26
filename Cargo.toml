@@ -16,3 +16,7 @@ anyhow = "1"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 toml = "0.5"
+
+[[example]]
+name = "json_files"
+path = "examples/json_files.rs"
