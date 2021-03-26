@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    name: Run tests
+    runs-on: ${{ matrix.os }}-latest
+    strategy:
+      matrix:
+        os:
+          - windows
+          - ubuntu
+    steps:
+      - uses: actions/checkout@v2
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Check format files
+        run: cargo fmt -- --check
+
+      - name: Check cargo-clippy
+        run: cargo clippy --all
+
+      - name: Check tests
+        run: cargo test
