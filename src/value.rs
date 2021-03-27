@@ -25,7 +25,7 @@
 //! hello_world = "Hello, world!"
 //!
 //! [pages]
-//!     [home]
+//!     [pages.home]
 //!     title = "Home page"
 //!     description = "This is the home page."
 //!
@@ -110,7 +110,7 @@ impl Value {
     /// ```rust
     /// use languages_rs::{Format, Value};
     ///
-    /// let value = Value::from_string(String::from("\"Hi\""), Format::JSON);
+    /// let value = Value::from_string(String::from("\"Hi\""), Format::Json);
     /// assert!(value.is_ok());
     /// assert_eq!(value.unwrap(), Value::String(String::from("Hi")));
     /// ```
@@ -121,7 +121,7 @@ impl Value {
     ///
     /// use languages_rs::{Format, Value};
     ///
-    /// let value = Value::from_string(String::from("hi = \"Hi\""), Format::TOML);
+    /// let value = Value::from_string(String::from("hi = \"Hi\""), Format::Toml);
     /// assert!(value.is_ok());
     ///
     /// let mut data: HashMap<String, Value> = HashMap::new();
@@ -143,7 +143,7 @@ impl Value {
     /// ```rust
     /// use languages_rs::{Format, Value};
     ///
-    /// let value = Value::from_string(String::from("\"Hi\""), Format::JSON);
+    /// let value = Value::from_string(String::from("\"Hi\""), Format::Json);
     /// assert!(value.is_ok());
     /// assert!(value.unwrap().is_string());
     /// ```
@@ -152,7 +152,7 @@ impl Value {
     /// ```rust
     /// use languages_rs::{Format, Value};
     ///
-    /// let value = Value::from_string(String::from("hi = \"Hi\""), Format::TOML);
+    /// let value = Value::from_string(String::from("hi = \"Hi\""), Format::Toml);
     /// assert!(value.is_ok());
     ///
     /// let table = value.unwrap().get_object();
@@ -173,7 +173,7 @@ impl Value {
     /// ```rust
     /// use languages_rs::{Format, Value};
     ///
-    /// let value = Value::from_string(String::from("\"Hi\""), Format::JSON);
+    /// let value = Value::from_string(String::from("\"Hi\""), Format::Json);
     /// assert!(value.is_ok());
     /// assert_eq!(value.unwrap().get_string(), Some(String::from("Hi")));
     /// ```
@@ -182,7 +182,7 @@ impl Value {
     /// ```rust
     /// use languages_rs::{Format, Value};
     ///
-    /// let value = Value::from_string(String::from("hi = \"Hi\""), Format::TOML);
+    /// let value = Value::from_string(String::from("hi = \"Hi\""), Format::Toml);
     /// assert!(value.is_ok());
     ///
     /// let table = value.unwrap().get_object();
@@ -206,7 +206,7 @@ impl Value {
     /// ```rust
     /// use languages_rs::{Format, Value};
     ///
-    /// let value = Value::from_string(String::from("[\"1\", \"2\"]"), Format::JSON);
+    /// let value = Value::from_string(String::from("[\"1\", \"2\"]"), Format::Json);
     /// assert!(value.is_ok());
     /// assert!(value.unwrap().is_array());
     /// ```
@@ -215,7 +215,7 @@ impl Value {
     /// ```rust
     /// use languages_rs::{Format, Value};
     ///
-    /// let value = Value::from_string(String::from("numbers = [\"1\", \"2\"]"), Format::TOML);
+    /// let value = Value::from_string(String::from("numbers = [\"1\", \"2\"]"), Format::Toml);
     /// assert!(value.is_ok());
     ///
     /// let table = value.unwrap().get_object();
@@ -236,7 +236,7 @@ impl Value {
     /// ```rust
     /// use languages_rs::{Format, Value};
     ///
-    /// let value = Value::from_string(String::from("[\"1\", \"2\"]"), Format::JSON);
+    /// let value = Value::from_string(String::from("[\"1\", \"2\"]"), Format::Json);
     /// assert!(value.is_ok());
     /// assert_eq!(value.unwrap().get_array(), Some(vec![Value::String(String::from("1")), Value::String(String::from("2"))]));
     /// ```
@@ -245,7 +245,7 @@ impl Value {
     /// ```rust
     /// use languages_rs::{Format, Value};
     ///
-    /// let value = Value::from_string(String::from("numbers = [\"1\", \"2\"]"), Format::TOML);
+    /// let value = Value::from_string(String::from("numbers = [\"1\", \"2\"]"), Format::Toml);
     /// assert!(value.is_ok());
     ///
     /// let table = value.unwrap().get_object();
@@ -269,7 +269,7 @@ impl Value {
     /// ```rust
     /// use languages_rs::{Format, Value};
     ///
-    /// let value = Value::from_string(String::from("{\"home\":{\"title\":\"Home page\"}}"), Format::JSON);
+    /// let value = Value::from_string(String::from("{\"home\":{\"title\":\"Home page\"}}"), Format::Json);
     /// assert!(value.is_ok());
     /// assert!(value.unwrap().is_object());
     /// ```
@@ -278,7 +278,7 @@ impl Value {
     /// ```rust
     /// use languages_rs::{Format, Value};
     ///
-    /// let value = Value::from_string(String::from("[home]\r\ntitle = \"Home page\""), Format::TOML);
+    /// let value = Value::from_string(String::from("[home]\r\ntitle = \"Home page\""), Format::Toml);
     /// assert!(value.is_ok());
     /// assert!(value.unwrap().is_object());
     /// ```
@@ -294,7 +294,7 @@ impl Value {
     ///
     /// use languages_rs::{Format, Value};
     ///
-    /// let value = Value::from_string(String::from("{ \"title\": \"Home page\" }"), Format::JSON);
+    /// let value = Value::from_string(String::from("{ \"title\": \"Home page\" }"), Format::Json);
     /// assert!(value.is_ok());
     ///
     /// let mut data: HashMap<String, Value> = HashMap::new();
@@ -309,7 +309,7 @@ impl Value {
     ///
     /// use languages_rs::{Format, Value};
     ///
-    /// let value = Value::from_string(String::from("title = \"Home page\""), Format::TOML);
+    /// let value = Value::from_string(String::from("title = \"Home page\""), Format::Toml);
     /// assert!(value.is_ok());
     ///
     /// let mut data: HashMap<String, Value> = HashMap::new();

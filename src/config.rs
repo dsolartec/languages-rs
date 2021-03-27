@@ -2,19 +2,19 @@ use std::{env, path::Path};
 
 #[derive(Clone, Copy)]
 pub enum Format {
-    JSON,
-    TOML,
+    Json,
+    Toml,
 }
 
 impl Format {
     /// Check if the format is JSON.
     pub fn is_json(&self) -> bool {
-        matches!(self, &Format::JSON)
+        matches!(self, &Format::Json)
     }
 
     /// Check if the format is TOML.
     pub fn is_toml(&self) -> bool {
-        matches!(self, &Format::TOML)
+        matches!(self, &Format::Toml)
     }
 
     /// Get file extension for the format (`.toml` or `.json`).
@@ -23,13 +23,13 @@ impl Format {
     /// ```rust
     /// use languages_rs::Format;
     ///
-    /// assert_eq!(Format::JSON.get_file_extension(), ".json");
-    /// assert_eq!(Format::TOML.get_file_extension(), ".toml");
+    /// assert_eq!(Format::Json.get_file_extension(), ".json");
+    /// assert_eq!(Format::Toml.get_file_extension(), ".toml");
     /// ```
     pub fn get_file_extension(&self) -> &str {
         match self {
-            Self::JSON => ".json",
-            Self::TOML => ".toml",
+            Self::Json => ".json",
+            Self::Toml => ".toml",
         }
     }
 }
@@ -48,7 +48,7 @@ impl Config {
     /// ```rust, ignore
     /// use languages_rs::{Config, Format};
     ///
-    /// let config: Config = match Config::new("languages", Format::JSON, vec!["en"]) {
+    /// let config: Config = match Config::new("languages", Format::Json, vec!["en"]) {
     ///     Ok(config) => config,
     ///     Err(e) => {
     ///         eprintln!("Error: {}", e);
@@ -73,7 +73,7 @@ impl Config {
         Ok(Self {
             directory: path.display().to_string(),
             format,
-            languages: languages.iter().map(|e| String::from(e.clone())).collect(),
+            languages: languages.iter().map(|e| String::from(*e)).collect(),
         })
     }
 
@@ -112,7 +112,7 @@ impl Config {
 
         Ok(Self {
             directory: path.display().to_string(),
-            format: Format::JSON,
+            format: Format::Json,
             languages: Vec::new(),
         })
     }
@@ -175,7 +175,7 @@ impl Config {
     /// use languages_rs::{Config, Format};
     ///
     /// let config = Config::default().unwrap();
-    /// assert_eq!(config.get_format(), Format::JSON);
+    /// assert_eq!(config.get_format(), Format::Json);
     /// ```
     pub fn get_format(&self) -> Format {
         self.format
@@ -190,7 +190,7 @@ impl Config {
     /// let mut config = Config::default().unwrap();
     /// assert!(config.get_format().is_json());
     ///
-    /// config.change_format(Format::TOML);
+    /// config.change_format(Format::Toml);
     /// assert!(config.get_format().is_toml());
     /// ```
     pub fn change_format(&mut self, new_format: Format) {

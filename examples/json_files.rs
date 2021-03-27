@@ -2,7 +2,7 @@ use languages_rs::*;
 
 fn main() -> anyhow::Result<()> {
     // Create a new configuration
-    let config = Config::new("examples/languages_json", Format::JSON, vec!["en", "es"])?;
+    let config = Config::new("examples/languages_json", Format::Json, vec!["en", "es"])?;
 
     // Load the texts.
     let mut texts = load(config)?;
@@ -37,7 +37,7 @@ fn main() -> anyhow::Result<()> {
         );
     }
 
-    println!("");
+    println!();
 
     // Get Spanish texts.
     if let Some(greeting_es) = texts.try_get_text_from_language("es", "greeting")? {
