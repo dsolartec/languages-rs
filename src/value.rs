@@ -113,11 +113,9 @@ impl Value {
     /// ```rust
     /// use languages_rs::Value;
     ///
-    /// fn main() {
-    ///     let value = Value::from_string(String::from("\"Hi\""));
-    ///     assert!(value.is_ok());
-    ///     assert_eq!(value.unwrap(), Value::String(String::from("Hi")));
-    /// }
+    /// let value = Value::from_string(String::from("\"Hi\""));
+    /// assert!(value.is_ok());
+    /// assert_eq!(value.unwrap(), Value::String(String::from("Hi")));
     /// ```
     #[cfg(feature = "with-json")]
     pub fn from_string(text: String) -> anyhow::Result<Self> {
@@ -130,17 +128,15 @@ impl Value {
     /// ```rust
     /// use languages_rs::Value;
     ///
-    /// fn main() {
-    ///     use std::collections::HashMap;
+    /// use std::collections::HashMap;
     ///
-    ///     let value = Value::from_string(String::from("hi = \"Hi\""));
-    ///     assert!(value.is_ok());
+    /// let value = Value::from_string(String::from("hi = \"Hi\""));
+    /// assert!(value.is_ok());
     ///
-    ///     let mut data: HashMap<String, Value> = HashMap::new();
-    ///     data.insert(String::from("hi"), Value::String(String::from("Hi")));
+    /// let mut data: HashMap<String, Value> = HashMap::new();
+    /// data.insert(String::from("hi"), Value::String(String::from("Hi")));
     ///
-    ///     assert_eq!(value.unwrap(), Value::Object(data));
-    /// }
+    /// assert_eq!(value.unwrap(), Value::Object(data));
     /// ```
     #[cfg(feature = "with-toml")]
     pub fn from_string(text: String) -> anyhow::Result<Self> {
