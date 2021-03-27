@@ -47,7 +47,10 @@ impl Languages {
     pub fn try_get_language(&mut self, lang: &str) -> anyhow::Result<LanguageTexts> {
         // Check if the configuration has the lang.
         if !self.config.get_languages().contains(&String::from(lang)) {
-            return Err(anyhow::Error::msg(format!("Cannot find the `{}` lang.", lang)));
+            return Err(anyhow::Error::msg(format!(
+                "Cannot find the `{}` lang.",
+                lang
+            )));
         }
 
         // Check if the language is in the cache and return it if exists.
