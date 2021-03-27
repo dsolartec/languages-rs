@@ -48,12 +48,12 @@ fn main() -> Result<()> {
 
 -   [json_files](./examples/json_files.rs) - Languages files with JSON.
     ```console
-    $ cargo run --example json_files
+    $ cargo run --example json_files --features "with-json"
     ```
 
 -   [toml_files](./examples/toml_files.rs) - Languages files with TOML.
     ```console
-    $ cargo run --example toml_files
+    $ cargo run --example toml_files --features "with-toml"
     ```
 
 ## Testing

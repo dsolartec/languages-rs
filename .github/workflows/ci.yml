@@ -24,9 +24,12 @@ jobs:
         run: cargo clippy --all-targets --all-features -- -D warnings
 
       - name: Check tests
-        run: cargo test
-      
+        run: |
+          carto test
+          cargo test --features "with-json"
+          cargo test --features "with-toml"
+
       - name: Run examples
         run: |
-          cargo run --example json_files
-          cargo run --example toml_files
+          cargo run --example json_files --features "with-json"
+          cargo run --example toml_files --features "with-toml"

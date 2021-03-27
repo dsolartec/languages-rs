@@ -1,43 +1,8 @@
 use std::{env, path::Path};
 
-#[derive(Clone, Copy)]
-pub enum Format {
-    Json,
-    Toml,
-}
-
-impl Format {
-    /// Check if the format is JSON.
-    pub fn is_json(&self) -> bool {
-        matches!(self, &Format::Json)
-    }
-
-    /// Check if the format is TOML.
-    pub fn is_toml(&self) -> bool {
-        matches!(self, &Format::Toml)
-    }
-
-    /// Get file extension for the format (`.toml` or `.json`).
-    ///
-    /// # Example
-    /// ```rust
-    /// use languages_rs::Format;
-    ///
-    /// assert_eq!(Format::Json.get_file_extension(), ".json");
-    /// assert_eq!(Format::Toml.get_file_extension(), ".toml");
-    /// ```
-    pub fn get_file_extension(&self) -> &str {
-        match self {
-            Self::Json => ".json",
-            Self::Toml => ".toml",
-        }
-    }
-}
-
 #[derive(Clone)]
 pub struct Config {
     directory: String,
-    format: Format,
     languages: Vec<String>,
 }
 
@@ -46,9 +11,9 @@ impl Config {
     ///
     /// # Example
     /// ```rust, ignore
-    /// use languages_rs::{Config, Format};
+    /// use languages_rs::Config;
     ///
-    /// let config: Config = match Config::new("languages", Format::Json, vec!["en"]) {
+    /// let config: Config = match Config::new("languages", vec!["en"]) {
     ///     Ok(config) => config,
     ///     Err(e) => {
     ///         eprintln!("Error: {}", e);
@@ -56,7 +21,7 @@ impl Config {
     ///     },
     /// };
     /// ```
-    pub fn new(directory: &str, format: Format, languages: Vec<&str>) -> anyhow::Result<Self> {
+    pub fn new(directory: &str, languages: Vec<&str>) -> anyhow::Result<Self> {
         let path = Path::new(&env::current_dir()?).join(directory);
         if !path.exists() {
             return Err(anyhow::Error::msg(format!(
@@ -72,7 +37,6 @@ impl Config {
 
         Ok(Self {
             directory: path.display().to_string(),
-            format,
             languages: languages.iter().map(|e| String::from(*e)).collect(),
         })
     }
@@ -83,7 +47,6 @@ impl Config {
     /// ```json
     /// {
     ///     "directory": "languages/",
-    ///     "format": "JSON",
     ///     "languages": []
     /// ```
     ///
@@ -112,7 +75,6 @@ impl Config {
 
         Ok(Self {
             directory: path.display().to_string(),
-            format: Format::Json,
             languages: Vec::new(),
         })
     }
@@ -166,35 +128,6 @@ impl Config {
 
         self.directory = path.display().to_string();
         Ok(())
-    }
-
-    /// Get the format files.
-    ///
-    /// # Example
-    /// ```rust, ignore
-    /// use languages_rs::{Config, Format};
-    ///
-    /// let config = Config::default().unwrap();
-    /// assert_eq!(config.get_format(), Format::Json);
-    /// ```
-    pub fn get_format(&self) -> Format {
-        self.format
-    }
-
-    /// Change the format files.
-    ///
-    /// # Example
-    /// ```rust, ignore
-    /// use languages_rs::{Config, Format};
-    ///
-    /// let mut config = Config::default().unwrap();
-    /// assert!(config.get_format().is_json());
-    ///
-    /// config.change_format(Format::Toml);
-    /// assert!(config.get_format().is_toml());
-    /// ```
-    pub fn change_format(&mut self, new_format: Format) {
-        self.format = new_format;
     }
 
     /// Get the availables languages.

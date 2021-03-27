@@ -64,7 +64,7 @@ impl Languages {
         let path = Path::new(&self.config.get_directory()).join(format!(
             "{}{}",
             lang,
-            self.config.get_format().get_file_extension()
+            if cfg!(feature = "with-json") { ".json" } else if cfg!(feature = "with-toml") { ".toml" } else { "" }
         ));
 
         // Check if the file exists.
@@ -83,7 +83,7 @@ impl Languages {
         // Generate the language texts object for the file.
         let lang_texts = LanguageTexts::new(
             String::from(lang),
-            Value::from_string(read_to_string(path)?, self.config.get_format())?,
+            Value::from_string(read_to_string(path)?)?,
         )?;
 
         // Add the language texts to the cache.
