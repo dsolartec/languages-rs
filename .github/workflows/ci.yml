@@ -25,3 +25,8 @@ jobs:
 
       - name: Check tests
         run: cargo test
+      
+      - name: Run examples
+        run: |
+          cargo run --example json_files
+          cargo run --example toml_files
