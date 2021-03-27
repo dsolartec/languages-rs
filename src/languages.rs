@@ -55,7 +55,7 @@ impl Languages {
 
         // Check if the language is in the cache and return it if exists.
         for lang_texts in self.langs.iter() {
-            if lang_texts.get_language() == String::from(lang) {
+            if lang_texts.get_language() == *lang {
                 return Ok(lang_texts.clone());
             }
         }

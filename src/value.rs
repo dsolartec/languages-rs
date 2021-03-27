@@ -343,7 +343,7 @@ impl fmt::Display for Value {
                     f,
                     "{{ {} }}",
                     value
-                        .into_iter()
+                        .iter()
                         .map(|(key, value)| format!("{}: {}", key, value))
                         .collect::<Vec<String>>()
                         .join(", ")
