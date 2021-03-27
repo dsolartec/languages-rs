@@ -20,3 +20,7 @@ toml = "0.5"
 [[example]]
 name = "json_files"
 path = "examples/json_files.rs"
+
+[[example]]
+name = "toml_files"
+path = "examples/toml_files.rs"
