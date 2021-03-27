@@ -28,7 +28,7 @@ jobs:
 
       - name: Check tests
         run: |
-          carto test
+          cargo test
           cargo test --features "with-json"
           cargo test --features "with-toml"
 
