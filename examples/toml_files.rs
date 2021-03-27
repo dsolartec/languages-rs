@@ -2,7 +2,7 @@ use languages_rs::*;
 
 fn main() -> anyhow::Result<()> {
     // Create a new configuration
-    let config = Config::new("examples/languages_toml", vec!["en", "es"])?;
+    let config = Config::new("examples/texts/toml", vec!["en", "es"])?;
 
     // Load the texts.
     let mut texts = load(config)?;
