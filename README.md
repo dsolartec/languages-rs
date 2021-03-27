@@ -1,4 +1,7 @@
-# languages-rs
+# languages-rs &emsp; ![Crates.io version][crates.io] ![CI workflow status][CI]
+
+[crates.io]: https://img.shields.io/crates/v/languages-rs
+[CI]: https://img.shields.io/github/workflow/status/danielsolartech/languages-rs/CI
 
 An internationalization library for Rust.
 
