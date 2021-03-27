@@ -4,9 +4,16 @@ An internationalization library for Rust.
 
 ## Installation
 
+Use with JSON language files:
 ```toml
 [dependencies]
-languages-rs = "0.1.0"
+languages-rs = { version = "0.2.0", features = ["with-json"] }
+```
+
+Use with TOML language files:
+```toml
+[dependencies]
+languages-rs = { version = "0.2.0", features = ["with-toml"] }
 ```
 
 ## Basic Usage
