@@ -64,7 +64,13 @@ impl Languages {
         let path = Path::new(&self.config.get_directory()).join(format!(
             "{}{}",
             lang,
-            if cfg!(feature = "with-json") { ".json" } else if cfg!(feature = "with-toml") { ".toml" } else { "" }
+            if cfg!(feature = "with-json") {
+                ".json"
+            } else if cfg!(feature = "with-toml") {
+                ".toml"
+            } else {
+                ""
+            }
         ));
 
         // Check if the file exists.
