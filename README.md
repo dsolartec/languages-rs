@@ -1,33 +1,38 @@
-# languages-rs &emsp; ![Crates.io version][crates.io] ![CI workflow status][CI]
+# languages-rs &emsp; ![Crates.io version][crates.io] ![CI workflow status][ci]
 
 [crates.io]: https://img.shields.io/crates/v/languages-rs
-[CI]: https://img.shields.io/github/workflow/status/danielsolartech/languages-rs/CI
+[ci]: https://img.shields.io/github/workflow/status/danielsolartech/languages-rs/CI
 
 An internationalization library for Rust.
 
 ## Installation
 
 Use with JSON language files:
+
 ```toml
 [dependencies]
 languages-rs = { version = "0.2.0", features = ["with-json"] }
 ```
 
 Use with TOML language files:
+
 ```toml
 [dependencies]
 languages-rs = { version = "0.2.0", features = ["with-toml"] }
 ```
 
 ## Basic Usage
+
 `languages/en.json`
+
 ```json
 {
-    "hello_world": "Hello world!"
+  "hello_world": "Hello world!"
 }
 ```
 
 `src/main.rs`
+
 ```rust
 use languages_rs::{Config, Languages, load, Value};
 
@@ -56,15 +61,16 @@ fn main() -> Result<()> {
 
 ## Examples
 
--   [json_files](./examples/json_files.rs) - Languages files with JSON.
-    ```console
-    $ cargo run --example json_files --features "with-json"
-    ```
+- [json_files](./examples/json_files.rs) - Languages files with JSON.
 
--   [toml_files](./examples/toml_files.rs) - Languages files with TOML.
-    ```console
-    $ cargo run --example toml_files --features "with-toml"
-    ```
+  ```console
+  $ cargo run --example json_files --features "with-json"
+  ```
+
+- [toml_files](./examples/toml_files.rs) - Languages files with TOML.
+  ```console
+  $ cargo run --example toml_files --features "with-toml"
+  ```
 
 ## Testing
 
@@ -74,7 +80,7 @@ $ cargo test
 
 ## Authors
 
-- [@danielsolartech](https://github.com/danielsolartech) - Initial project
+- [@daschdev](https://github.com/daschdev) - Initial project
 
 ## Changelog
 
