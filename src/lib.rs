@@ -56,7 +56,7 @@
 //!     configuration.add_language("en").unwrap();
 //!
 //!     // Load all default languages.
-//!     let texts: Languages = load(configuration).unwrap();
+//!     let mut texts: Languages = load(configuration).unwrap();
 //!
 //!     // Get the English texts from `/languages/es.json`.
 //!     let texts_en: LanguagesTexts = texts.try_get_language("en").unwrap();
@@ -78,7 +78,7 @@ mod config;
 mod languages;
 mod value;
 
-pub use config::{Config, Format};
+pub use config::Config;
 pub use languages::{LanguageTexts, Languages};
 pub use value::Value;
 

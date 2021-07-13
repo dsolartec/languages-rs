@@ -37,10 +37,11 @@
 
 use std::{collections::HashMap, fmt};
 
-use serde_json::Value as JSONValue;
-use toml::Value as TOMLValue;
+#[cfg(feature = "with-json")]
+use serde_json::Value as JsonValue;
 
-use crate::Format;
+#[cfg(feature = "with-toml")]
+use toml::Value as TomlValue;
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum Value {
@@ -50,7 +51,8 @@ pub enum Value {
 }
 
 impl Value {
-    fn from_json_value(value: JSONValue) -> anyhow::Result<Self> {
+    #[cfg(feature = "with-json")]
+    fn from_value(value: JsonValue) -> anyhow::Result<Self> {
         if value.is_string() {
             return Ok(Self::String(String::from(value.as_str().unwrap())));
         } else if value.is_array() {
@@ -59,13 +61,13 @@ impl Value {
                     .as_array()
                     .unwrap()
                     .iter()
-                    .map(|e| Self::from_json_value(e.clone()).expect("Invalid format."))
+                    .map(|e| Self::from_value(e.clone()).expect("Invalid format."))
                     .collect(),
             ));
         } else if value.is_object() {
             let mut new_data: HashMap<String, Value> = HashMap::new();
             for (key, value) in value.as_object().unwrap().iter() {
-                new_data.insert(key.clone(), Self::from_json_value(value.clone())?);
+                new_data.insert(key.clone(), Self::from_value(value.clone())?);
             }
 
             return Ok(Self::Object(new_data));
@@ -77,7 +79,8 @@ impl Value {
         )))
     }
 
-    pub fn from_toml_value(value: TOMLValue) -> anyhow::Result<Self> {
+    #[cfg(feature = "with-toml")]
+    pub fn from_value(value: TomlValue) -> anyhow::Result<Self> {
         if value.is_str() {
             return Ok(Self::String(String::from(value.as_str().unwrap())));
         } else if value.is_array() {
@@ -86,13 +89,13 @@ impl Value {
                     .as_array()
                     .unwrap()
                     .iter()
-                    .map(|e| Self::from_toml_value(e.clone()).expect("Invalid format."))
+                    .map(|e| Self::from_value(e.clone()).expect("Invalid format."))
                     .collect(),
             ));
         } else if value.is_table() {
             let mut new_data: HashMap<String, Value> = HashMap::new();
             for (key, value) in value.as_table().unwrap().iter() {
-                new_data.insert(key.clone(), Self::from_toml_value(value.clone())?);
+                new_data.insert(key.clone(), Self::from_value(value.clone())?);
             }
 
             return Ok(Self::Object(new_data));
@@ -104,24 +107,30 @@ impl Value {
         )))
     }
 
-    /// Get the texts from a JSON string or TOML string.
+    /// Get the texts from a JSON string.
     ///
-    /// # Example JSON
+    /// # Example
     /// ```rust
-    /// use languages_rs::{Format, Value};
+    /// use languages_rs::Value;
     ///
-    /// let value = Value::from_string(String::from("\"Hi\""), Format::Json);
+    /// let value = Value::from_string(String::from("\"Hi\""));
     /// assert!(value.is_ok());
     /// assert_eq!(value.unwrap(), Value::String(String::from("Hi")));
     /// ```
+    #[cfg(feature = "with-json")]
+    pub fn from_string(text: String) -> anyhow::Result<Self> {
+        Self::from_value(serde_json::from_str(&text)?)
+    }
+
+    /// Get the texts from a JSON string or TOML string.
     ///
-    /// # Example TOML
+    /// # Example
     /// ```rust
+    /// use languages_rs::Value;
+    ///
     /// use std::collections::HashMap;
     ///
-    /// use languages_rs::{Format, Value};
-    ///
-    /// let value = Value::from_string(String::from("hi = \"Hi\""), Format::Toml);
+    /// let value = Value::from_string(String::from("hi = \"Hi\""));
     /// assert!(value.is_ok());
     ///
     /// let mut data: HashMap<String, Value> = HashMap::new();
@@ -129,39 +138,45 @@ impl Value {
     ///
     /// assert_eq!(value.unwrap(), Value::Object(data));
     /// ```
-    pub fn from_string(text: String, format: Format) -> anyhow::Result<Self> {
-        if format.is_json() {
-            Self::from_json_value(serde_json::from_str(&text)?)
-        } else {
-            Self::from_toml_value(text.parse()?)
-        }
+    #[cfg(feature = "with-toml")]
+    pub fn from_string(text: String) -> anyhow::Result<Self> {
+        Self::from_value(text.parse()?)
+    }
+
+    #[cfg(all(not(feature = "with-json"), not(feature = "with-toml")))]
+    pub fn from_string(_text: String) -> anyhow::Result<Self> {
+        Err(anyhow::Error::msg("You must define the parse feature."))
     }
 
     /// Check if the current value is a string.
     ///
     /// # Example
     /// ```rust
-    /// use languages_rs::{Format, Value};
+    /// use languages_rs::Value;
     ///
-    /// let value = Value::from_string(String::from("\"Hi\""), Format::Json);
-    /// assert!(value.is_ok());
-    /// assert!(value.unwrap().is_string());
-    /// ```
+    /// #[cfg(feature = "with-json")]
+    /// fn main() {
+    ///     let value = Value::from_string(String::from("\"Hi\""));
+    ///     assert!(value.is_ok());
+    ///     assert!(value.unwrap().is_string());
+    /// }
     ///
-    /// # Example TOML
-    /// ```rust
-    /// use languages_rs::{Format, Value};
+    /// #[cfg(feature = "with-toml")]
+    /// fn main() {
+    ///     let value = Value::from_string(String::from("hi = \"Hi\""));
+    ///     assert!(value.is_ok());
     ///
-    /// let value = Value::from_string(String::from("hi = \"Hi\""), Format::Toml);
-    /// assert!(value.is_ok());
+    ///     let table = value.unwrap().get_object();
+    ///     assert!(table.is_some());
     ///
-    /// let table = value.unwrap().get_object();
-    /// assert!(table.is_some());
+    ///     let table = table.unwrap();
+    ///     let text = table.get("hi");
+    ///     assert!(text.is_some());
+    ///     assert!(text.unwrap().is_string());
+    /// }
     ///
-    /// let table = table.unwrap();
-    /// let text = table.get("hi");
-    /// assert!(text.is_some());
-    /// assert!(text.unwrap().is_string());
+    /// #[cfg(all(not(feature = "with-json"), not(feature = "with-toml")))]
+    /// fn main() {}
     /// ```
     pub fn is_string(&self) -> bool {
         matches!(self, Self::String(_))
@@ -169,29 +184,33 @@ impl Value {
 
     /// Get the string value.
     ///
-    /// # Example JSON
+    /// # Example
     /// ```rust
-    /// use languages_rs::{Format, Value};
+    /// use languages_rs::Value;
     ///
-    /// let value = Value::from_string(String::from("\"Hi\""), Format::Json);
-    /// assert!(value.is_ok());
-    /// assert_eq!(value.unwrap().get_string(), Some(String::from("Hi")));
-    /// ```
+    /// #[cfg(feature = "with-json")]
+    /// fn main() {
+    ///     let value = Value::from_string(String::from("\"Hi\""));
+    ///     assert!(value.is_ok());
+    ///     assert_eq!(value.unwrap().get_string(), Some(String::from("Hi")));
+    /// }
     ///
-    /// # Example TOML
-    /// ```rust
-    /// use languages_rs::{Format, Value};
+    /// #[cfg(feature = "with-toml")]
+    /// fn main() {
+    ///     let value = Value::from_string(String::from("hi = \"Hi\""));
+    ///     assert!(value.is_ok());
     ///
-    /// let value = Value::from_string(String::from("hi = \"Hi\""), Format::Toml);
-    /// assert!(value.is_ok());
+    ///     let table = value.unwrap().get_object();
+    ///     assert!(table.is_some());
     ///
-    /// let table = value.unwrap().get_object();
-    /// assert!(table.is_some());
+    ///     let table = table.unwrap();
+    ///     let text = table.get("hi");
+    ///     assert!(text.is_some());
+    ///     assert_eq!(text.unwrap().get_string(), Some(String::from("Hi")));
+    /// }
     ///
-    /// let table = table.unwrap();
-    /// let text = table.get("hi");
-    /// assert!(text.is_some());
-    /// assert_eq!(text.unwrap().get_string(), Some(String::from("Hi")));
+    /// #[cfg(all(not(feature = "with-json"), not(feature = "with-toml")))]
+    /// fn main() {}
     /// ```
     pub fn get_string(&self) -> Option<String> {
         match self {
@@ -202,29 +221,33 @@ impl Value {
 
     /// Check if the current value is an array.
     ///
-    /// # Example JSON
+    /// # Example
     /// ```rust
-    /// use languages_rs::{Format, Value};
+    /// use languages_rs::Value;
     ///
-    /// let value = Value::from_string(String::from("[\"1\", \"2\"]"), Format::Json);
-    /// assert!(value.is_ok());
-    /// assert!(value.unwrap().is_array());
-    /// ```
+    /// #[cfg(feature = "with-json")]
+    /// fn main() {
+    ///     let value = Value::from_string(String::from("[\"1\", \"2\"]"));
+    ///     assert!(value.is_ok());
+    ///     assert!(value.unwrap().is_array());
+    /// }
     ///
-    /// # Example TOML
-    /// ```rust
-    /// use languages_rs::{Format, Value};
+    /// #[cfg(feature = "with-toml")]
+    /// fn main() {
+    ///     let value = Value::from_string(String::from("numbers = [\"1\", \"2\"]"));
+    ///     assert!(value.is_ok());
     ///
-    /// let value = Value::from_string(String::from("numbers = [\"1\", \"2\"]"), Format::Toml);
-    /// assert!(value.is_ok());
+    ///     let table = value.unwrap().get_object();
+    ///     assert!(table.is_some());
     ///
-    /// let table = value.unwrap().get_object();
-    /// assert!(table.is_some());
+    ///     let table = table.unwrap();
+    ///     let values = table.get("numbers");
+    ///     assert!(values.is_some());
+    ///     assert!(values.unwrap().is_array());
+    /// }
     ///
-    /// let table = table.unwrap();
-    /// let values = table.get("numbers");
-    /// assert!(values.is_some());
-    /// assert!(values.unwrap().is_array());
+    /// #[cfg(all(not(feature = "with-json"), not(feature = "with-toml")))]
+    /// fn main() {}
     /// ```
     pub fn is_array(&self) -> bool {
         matches!(self, Self::Array(_))
@@ -232,29 +255,39 @@ impl Value {
 
     /// Get the array value.
     ///
-    /// # Example JSON
+    /// # Example
     /// ```rust
-    /// use languages_rs::{Format, Value};
+    /// use languages_rs::Value;
     ///
-    /// let value = Value::from_string(String::from("[\"1\", \"2\"]"), Format::Json);
-    /// assert!(value.is_ok());
-    /// assert_eq!(value.unwrap().get_array(), Some(vec![Value::String(String::from("1")), Value::String(String::from("2"))]));
-    /// ```
+    /// #[cfg(feature = "with-json")]
+    /// fn main() {
+    ///     let value = Value::from_string(String::from("[\"1\", \"2\"]"));
+    ///     assert!(value.is_ok());
+    ///     assert_eq!(
+    ///         value.unwrap().get_array(),
+    ///         Some(vec![Value::String(String::from("1")), Value::String(String::from("2"))]),
+    ///     );
+    /// }
     ///
-    /// # Example TOML
-    /// ```rust
-    /// use languages_rs::{Format, Value};
+    /// #[cfg(feature = "with-toml")]
+    /// fn main() {
+    ///     let value = Value::from_string(String::from("numbers = [\"1\", \"2\"]"));
+    ///     assert!(value.is_ok());
     ///
-    /// let value = Value::from_string(String::from("numbers = [\"1\", \"2\"]"), Format::Toml);
-    /// assert!(value.is_ok());
+    ///     let table = value.unwrap().get_object();
+    ///     assert!(table.is_some());
     ///
-    /// let table = value.unwrap().get_object();
-    /// assert!(table.is_some());
+    ///     let table = table.unwrap();
+    ///     let values = table.get("numbers");
+    ///     assert!(values.is_some());
+    ///     assert_eq!(
+    ///         values.unwrap().get_array(),
+    ///         Some(vec![Value::String(String::from("1")), Value::String(String::from("2"))]),
+    ///     );
+    /// }
     ///
-    /// let table = table.unwrap();
-    /// let values = table.get("numbers");
-    /// assert!(values.is_some());
-    /// assert_eq!(values.unwrap().get_array(), Some(vec![Value::String(String::from("1")), Value::String(String::from("2"))]));
+    /// #[cfg(all(not(feature = "with-json"), not(feature = "with-toml")))]
+    /// fn main() {}
     /// ```
     pub fn get_array(&self) -> Option<Vec<Value>> {
         match self {
@@ -267,20 +300,24 @@ impl Value {
     ///
     /// # Example JSON
     /// ```rust
-    /// use languages_rs::{Format, Value};
+    /// use languages_rs::Value;
     ///
-    /// let value = Value::from_string(String::from("{\"home\":{\"title\":\"Home page\"}}"), Format::Json);
-    /// assert!(value.is_ok());
-    /// assert!(value.unwrap().is_object());
-    /// ```
+    /// #[cfg(feature = "with-json")]
+    /// fn main() {
+    ///     let value = Value::from_string(String::from("{\"home\":{\"title\":\"Home page\"}}"));
+    ///     assert!(value.is_ok());
+    ///     assert!(value.unwrap().is_object());
+    /// }
     ///
-    /// # Example TOML
-    /// ```rust
-    /// use languages_rs::{Format, Value};
+    /// #[cfg(feature = "with-toml")]
+    /// fn main() {
+    ///     let value = Value::from_string(String::from("[home]\r\ntitle = \"Home page\""));
+    ///     assert!(value.is_ok());
+    ///     assert!(value.unwrap().is_object());
+    /// }
     ///
-    /// let value = Value::from_string(String::from("[home]\r\ntitle = \"Home page\""), Format::Toml);
-    /// assert!(value.is_ok());
-    /// assert!(value.unwrap().is_object());
+    /// #[cfg(all(not(feature = "with-json"), not(feature = "with-toml")))]
+    /// fn main() {}
     /// ```
     pub fn is_object(&self) -> bool {
         matches!(self, Self::Object(_))
@@ -292,30 +329,32 @@ impl Value {
     /// ```rust
     /// use std::collections::HashMap;
     ///
-    /// use languages_rs::{Format, Value};
+    /// use languages_rs::Value;
     ///
-    /// let value = Value::from_string(String::from("{ \"title\": \"Home page\" }"), Format::Json);
-    /// assert!(value.is_ok());
+    /// #[cfg(feature = "with-json")]
+    /// fn main() {
+    ///     let value = Value::from_string(String::from("{ \"title\": \"Home page\" }"));
+    ///     assert!(value.is_ok());
     ///
-    /// let mut data: HashMap<String, Value> = HashMap::new();
-    /// data.insert(String::from("title"), Value::String(String::from("Home page")));
+    ///     let mut data: HashMap<String, Value> = HashMap::new();
+    ///     data.insert(String::from("title"), Value::String(String::from("Home page")));
     ///
-    /// assert_eq!(value.unwrap().get_object(), Some(data));
-    /// ```
+    ///     assert_eq!(value.unwrap().get_object(), Some(data));
+    /// }
     ///
-    /// # Example TOML
-    /// ```rust
-    /// use std::collections::HashMap;
+    /// #[cfg(feature = "with-toml")]
+    /// fn main() {
+    ///     let value = Value::from_string(String::from("title = \"Home page\""));
+    ///     assert!(value.is_ok());
     ///
-    /// use languages_rs::{Format, Value};
+    ///     let mut data: HashMap<String, Value> = HashMap::new();
+    ///     data.insert(String::from("title"), Value::String(String::from("Home page")));
     ///
-    /// let value = Value::from_string(String::from("title = \"Home page\""), Format::Toml);
-    /// assert!(value.is_ok());
+    ///     assert_eq!(value.unwrap().get_object(), Some(data));
+    /// }
     ///
-    /// let mut data: HashMap<String, Value> = HashMap::new();
-    /// data.insert(String::from("title"), Value::String(String::from("Home page")));
-    ///
-    /// assert_eq!(value.unwrap().get_object(), Some(data));
+    /// #[cfg(all(not(feature = "with-json"), not(feature = "with-toml")))]
+    /// fn main() {}
     /// ```
     pub fn get_object(&self) -> Option<HashMap<String, Value>> {
         match self {
