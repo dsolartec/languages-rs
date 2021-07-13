@@ -6,6 +6,7 @@ use std::{fs::read_to_string, path::Path};
 
 use crate::{Config, Value};
 
+#[derive(Clone)]
 pub struct Languages {
     config: Config,
     langs: Vec<LanguageTexts>,
